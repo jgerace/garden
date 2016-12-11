@@ -1,0 +1,28 @@
+{% extends base.html %}
+
+{% block header %}
+<h1 class="page-header">Device {{ device["name"] }}</h1>
+{% end %}
+
+{% block content %}
+<div class="table-responsive">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+	<th>Name</th>
+	<th>ID</th>
+	<th>Start Time</th>
+	<th>Duration (sec)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+	<td>{{ device["name"] }} </td>
+	<td>{{ device["id"] }}</td>
+	<td>{{ device["start"] }}</td>
+	<td>{{ device["duration"] }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+{% end %}

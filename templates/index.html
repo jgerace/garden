@@ -1,0 +1,109 @@
+{% extends base.html %}
+
+{% block header %}
+<h1 class="page-header">Devices</h1>
+{% end %}
+
+{% block content %}
+<div class="table-responsive">
+  <table class="table table-striped" id="device-table">
+    <thead>
+      <tr>
+	<th>Name</th>
+	<th>Start Time</th>
+	<th>Duration (sec)</th>
+	<th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for device in devices %}
+      <tr id="{{devices[device]['id'] }}">
+	<td><a href="{{ reverse_url('device', devices[device]['id']) }}">{{ devices[device]["name"] }}</a></td>
+	<td id="{{devices[device]['id'] }}-start">{{ devices[device]["start"] }}</td>
+	<td id="{{devices[device]['id'] }}-duration">{{ devices[device]["duration"] }}</td>
+	<td><span id="{{ devices[device]['id'] }}-status"></span></td>
+      </tr>
+      {% end %}
+    </tbody>
+  </table>
+</div>
+{% end %}
+
+{% block footer %}
+<script type="text/javascript">
+    var ws = new WebSocket('ws://localhost:8888/adminws');
+    var $message = $('#message');
+    ws.onopen = function(){
+      return;
+    };
+    ws.onmessage = function(ev){
+      var data = JSON.parse(ev.data);
+      for (var ii=0; ii < data.length; ii++) {
+	device_obj = data[ii];		  
+			  
+        action = device_obj.action
+        if(action == "DELETE") {
+	  $('#' + device_obj.data.device_id).remove();
+        }
+        else {
+          device = device_obj["data"]
+          device_row = document.getElementById(device.id);
+
+          if(device_row) {
+            start_item = $('#' + device.id + '-start')
+            start_item.text(device.start)
+            duration_item = $('#' + device.id + '-duration')
+            duration_item.text(device.duration)
+            status_item = $('#' + device.id + '-status')
+            status_item.hide();
+            status_item.fadeIn("slow");
+            status_item.text(device.status);
+            status_item.attr("class", getStatusLabel(device.status));
+          }
+          else {
+            table = document.getElementById("device-table");
+            row = table.insertRow(-1);
+            row.setAttribute("id", device.id);
+            name_item = row.insertCell(0);
+            link_item = document.createElement('a');
+            link_item.setAttribute("href", ""+{{ reverse_url('device', '') }}+device.id);
+            link_item.innerHTML = device.name
+            name_item.appendChild(link_item);
+            start_item = row.insertCell(1);
+            start_item.innerHTML = device.start;
+            start_item.setAttribute("id", ""+device.start+"-start");
+            duration_item = row.insertCell(2);
+            duration_item.innerHTML = device.duration;
+            duration_item.setAttribute("id", ""+device.start+"-duration");
+            status_item = row.insertCell(3);
+            span_item = document.createElement('span');
+            span_item.innerHTML = device.status;
+            span_item.setAttribute("class", getStatusLabel(device.status));
+            span_item.setAttribute("id", ""+device.start+"-status");
+            status_item.appendChild(span_item);
+    
+          }
+        }
+      }
+    };
+    ws.onclose = function(ev){
+      $message.attr("class", 'label label-important');
+      $message.text('closed');
+    };
+    ws.onerror = function(ev){
+      $message.attr("class", 'label label-warning');
+      $message.text('error occurred');
+    };
+
+    getStatusLabel = function(status) {
+      switch(status) {
+        case "Ready":
+        return 'label label-primary';
+        case "Watering":
+        return 'label label-success';
+        default:
+        return 'label label-default';
+      }
+    }
+  </script>
+{% end %}
