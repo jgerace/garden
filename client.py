@@ -189,9 +189,7 @@ def updateConfig(config_path):
 def main(args):
     updateConfig(args.config)
 
-    url = "ws://localhost:8888/devicews"
-    
-    thread1 = WebSocketThread(url)
+    thread1 = WebSocketThread(args.server_url)
     thread2 = WateringThread()
 
     thread1.start()
@@ -204,6 +202,10 @@ if __name__ == '__main__':
                         type=str,
                         help="Path to config file",
                         default="config.cfg")
+    parser.add_argument("--server_url",
+                        type=str,
+                        help="Address for server's websocket listener",
+                        default="ws://localhost:8888/devicews")
     args = parser.parse_args()
     
     main(args)

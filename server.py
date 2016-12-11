@@ -1,3 +1,4 @@
+import argparse
 from datetime import time
 import os.path
 
@@ -144,6 +145,13 @@ settings = dict(
 app = web.Application(handlers, **settings)
 
 if __name__ == '__main__':
-    # TODO: Configure port via params
-    app.listen(8888)
+    parser = argparse.ArgumentParser(description="Server to manage plant watering devices")
+    parser.add_argument("--port",
+                        type=int,
+                        help="Port to listen for incoming websocket connections",
+                        default=8888)
+    args = parser.parse_args()
+    
+    app.listen(args.port)
+    
 ioloop.IOLoop.instance().start()
