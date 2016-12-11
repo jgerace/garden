@@ -135,8 +135,6 @@ handlers = [
     (r'/api', ApiHandler),
     url(r'/device', DeviceHandler),
     url(r'/device/(.*)', DeviceProfileHandler, name="device"),
-    (r'/(favicon.ico)', web.StaticFileHandler, {'path': '../'}),
-    (r'/(rest_api_example.png)', web.StaticFileHandler, {'path': './'}),
 ]
 
 settings = dict(
